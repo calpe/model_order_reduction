@@ -1,0 +1,282 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{amssymb}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+
+\title{Model Order Reduction for linear structural dynamics}
+
+\begin{document}
+\maketitle
+
+The governing equation of a linear structural dynamic system is
+\begin{equation}
+    \bm{M}\bm{\ddot{u}} + \bm{K}\bm{u} = \bm{0},
+    \label{eq:linear_equation}
+\end{equation}
+where $\bm{M}$ is the mass matrix and $\bm{K}$ is the stiffness matrix. Since all 
+the operators are linear, we can find an operator $\bm{V}$ such that 
+\begin{equation}
+    \bm{V}^T\bm{M}\bm{V}\bm{\ddot{q}} + \bm{V}^T\bm{K}\bm{V}\bm{q} = \bm{0},
+    \label{eq:reduced_linear_equation}
+\end{equation}
+where $\bm{M}_r=\bm{V}^T\bm{M}\bm{V}$ and $\bm{K}_r=\bm{V}^T\bm{K}\bm{V}$ are the reduced mass and 
+stiffness matrix. The equation \ref{eq:reduced_linear_equation} is a linear independent 
+system of equations with a reduced order $r$.\newline
+
+Goal: compute operator $\bm{V}$.
+
+\section{Modal truncation}
+Source: see references \cite{rutzmoser18}. \newline 
+
+In the modal truncation approach, the operator $\bm{V}$ is composed of a selected  
+eigenmodes of the system \ref{eq:linear_equation}.\newline
+
+Considering the analytical solution for the equation \ref{eq:linear_equation} such as
+\begin{equation}
+    \bm{u}(t) = \bm{\phi}_i \cos (\omega_it + \alpha),
+\end{equation}
+
+we obtain the generalized eigenvalue problem
+\begin{equation}
+    \omega_i^2 \bm{M}\bm{\phi}_i = \bm{K}\bm{\phi}_i,
+\end{equation}
+where $\omega_i$ are the eigenfrequencies and $\bm{\phi}_i$ are the eigenvectors of the system.\newline
+
+We fix the norm of the eigenvector to be one $\bm{\phi}_i^T \bm{M} \bm{\phi}_i=1$.\newline
+
+We gather all the eigenvectors in the matrix $\bm{\Phi} = [\bm{\phi}_1,..., \bm{\phi}_N]$. 
+We apply the operator $\bm{\phi}$ to the mass and stiffness matrices and we obtain
+\begin{align*}
+% \bm{\Phi}^T \bm{M} \bm{\Phi}&=\bm{I} & \bm{\Phi}^T \bm{K} \bm{\Phi}=0\\
+\bm{\Phi}^T \bm{M} \bm{\Phi}&=\bm{I} & \bm{\Phi}^T \bm{K} \bm{\Phi}=\begin{bmatrix}
+    \omega_1^2 & 0 & 0\\
+    0 & \ddots & 0 \\
+    0 & 0 & \omega_N^2
+  \end{bmatrix}.
+\end{align*}
+
+Using the basis $\bm{\Phi}$, the system \ref{eq:reduced_linear_equation} decouples into
+\begin{equation}
+    \begin{bmatrix}
+        \ddot{q_1} \\
+        \vdots\\
+        \ddot{q_N}
+      \end{bmatrix} + 
+      \begin{bmatrix}
+        \omega_1^2 & 0 & 0\\
+        0 & \ddots & 0 \\
+        0 & 0 & \omega_N^2
+      \end{bmatrix} \begin{bmatrix}
+        q_1 \\
+        \vdots\\
+        q_N
+      \end{bmatrix} = 
+      \begin{bmatrix}
+        0\\
+        \vdots\\
+        0
+      \end{bmatrix}.
+\end{equation}
+Projecting the system of equations in the basis $\bm{\Phi}$ results in decoupled system with 
+N independent ODE's.\newline
+
+In modal truncation, the full basis $\bm{\Phi}$ is truncated , so that $\bm{V}$ is only composed of 
+of a selection of vibration modes $\bm{\phi}_i$. \newline
+
+\textbf{Selection Criteria}
+\begin{enumerate}
+    \item Proposed by Geradin and Rixen 2014. Truncate eigenmodes $\bm{\phi}_i$ with eigenfrequencies $\omega_i$ up to twice the highest frequency of interest. 
+    \item Excite one degree of freedom. Choose the most energetic eigenmodes. 
+\end{enumerate}
+
+Computation of the eigenmodes: power iteration methods with combination with Lanczos iterations.
+
+\section{Krylov subspace reduction}
+
+It builds a basis with the knowledge of the force input locations.\newline
+
+The external force vector $\bm{g}$ can be expressed as the product of the constant location matrix 
+$\bm{G} \in \mathbb{R}^{N \times p}$ and the time dependent amplitude $\hat{\bm{g}}(t) \in \mathbb{R}^p$.\newline
+
+Key: build a basis $\bm{V}$ with the static displacements and higher order approximations. \newline
+
+We consider the linear equations of motions
+\begin{equation}
+  \bm{M}\bm{\ddot{u}} + \bm{K}\bm{u} = \bm{G}\hat{\bm{g}}. 
+  \label{eq:krylov_subspace_reduction}
+\end{equation}
+
+We consider $\bm{u}=\bm{v_1}$ to be a first approximation solution of the equation \ref{eq:krylov_subspace_reduction}. 
+As a first approximation, the acceleration term $\bm{M}\bm{\ddot{v}_1}$ cancels out. We obtain 
+\begin{equation}
+\bm{v}_1 = \bm{K}^{-1}\bm{G}\hat{\bm{g}}
+\end{equation}
+
+The first element of the Krylov basis is
+\begin{equation}
+  \bm{v}_{1, kry} = \bm{K}^{-1}\bm{G}
+  \end{equation}
+
+We can consider now $\bm{u}=\bm{v_1} + \bm{v_2}$ and insert to equation \ref{eq:krylov_subspace_reduction}
+\begin{equation}
+  \bm{M}(\bm{\ddot{v}_1} + \bm{\ddot{v}_2}) + \bm{K}(\bm{v}_1 + \bm{v}_2) = \bm{G}\hat{\bm{g}},
+  \label{eq:krylov_subspace_reduction}
+\end{equation}
+
+leading to 
+\begin{equation}
+  \bm{v}_{2, kry} = \bm{K}^{-1}\bm{M}\bm{v}_{1, kry} = \bm{K}^{-1}\bm{M}\bm{K}^{-1}\bm{G}.
+  \end{equation}
+
+This procedure can be repeated m times leading to the raw Krylov basis 
+\begin{equation}
+\bm{V}_{kry} = (\bm{K}^{-1}\bm{G}, \bm{K}^{-1}\bm{M}\bm{K}^{-1}\bm{G}, \ddots , (\bm{K}^{-1}\bm{M})^{m-1}\bm{K}^{-1}\bm{G})
+\end{equation}
+
+The linear independence between the elements of the basis is very poor. Orthogonalization
+shoud be done at each element computation with respect all previous Krylov vectors. This orthogonalization
+is known as Arnoldi and Lanzcos iteration (see \cite{geradin14}). \newline
+
+Modal Truncation Augmentation combine the advantages of modal truncation method and 
+Krylov subspace reduction. 
+
+\section{Proper Orthogonal Decomposition}
+Sources \cite{weiss19}.\newline
+
+Appropiate to non-linear systems. \newline
+
+Data-driven method: training simulations $\rightarrow$ analysis of the results $\rightarrow$ build 
+projection matrix $V$.\newline
+
+Used in fluid dynamics, damage detection and strutural dynamics.\newline
+
+We consider a marix with n samples and m observations as
+\begin{equation}
+  \bm{S} =
+  \begin{bmatrix}
+      u_1(t_1) \cdots u_n(t_1)\\
+      \vdots\\
+      u_1(t_m) \cdots u_n(t_m)\\
+    \end{bmatrix} 
+    .
+\end{equation}
+
+We extract the mean of each element of the matrix $u_i(t_j)' = u_i(t_j) - \hat{u}$ and 
+we obtain the matrix 
+\begin{equation}
+  \bm{U} =
+  \begin{bmatrix}
+      u_1'(t_1) \cdots u_n'(t_1)\\
+      \vdots\\
+      u_1'(t_m) \cdots u_n'(t_m)\\
+    \end{bmatrix} 
+    .
+\end{equation}
+
+We can compute the covariance matrix as 
+\begin{equation}
+  \bm{C} = \frac{1}{m-1}\bm{U}^T\bm{U} = \frac{1}{m-1}
+  \begin{bmatrix}
+      \sum_{i=1}^{m} u_1'(t_1) \cdots \sum_{i=1}^{m} u_n'(t_1)\\
+      \vdots\\
+      \sum_{i=1}^{m} u_1'(t_m) \cdots \sum_{i=1}^{m} u_n'(t_m)\\
+    \end{bmatrix} 
+    .
+\end{equation}
+
+We compute the eigenvectors and eigenvalues of matrix $\bm{C}$. Since $\bm{C}$ is symmetric,
+the eigenvectors necessarly form a orthonormal basis in which $\bm{C}$ can be diagonalized. 
+Formally, the covariance matrix is diagonalized as 
+\begin{equation}
+  \bm{C} = \bm{\Phi}\bm{\Lambda}\bm{\Phi}^{-1} = \bm{\Phi}\bm{\Lambda}\bm{\Phi}^T =
+  \begin{bmatrix}
+    \phi_{11} \cdots \phi_{1n}\\
+    \vdots\\
+    \phi_{m1} \cdots \phi_{mn}\\
+  \end{bmatrix} 
+    \begin{bmatrix}
+    \lambda_{11} \cdots \lambda_{1n}\\
+    \vdots\\
+    \lambda_{m1} \cdots \lambda_{mn}\\
+  \end{bmatrix} 
+  \begin{bmatrix}
+    \phi_{11} \cdots \phi_{n1}\\
+    \vdots\\
+    \phi_{1m} \cdots \phi_{nm}\\
+  \end{bmatrix} 
+  ,
+\end{equation}
+where the columns of $\bm{\Phi}$ are the eigenvectors of $\bm{C}$.\newline
+
+We can project the original dataset $\bm{U}$ onto each of the n modes as 
+\begin{equation}
+  \bm{A} = \bm{U}\bm{\Phi} =
+  \begin{bmatrix}
+    a_{11} \cdots a_{1n}\\
+    \vdots\\
+    a_{m1} \cdots a_{mn}\\
+  \end{bmatrix}
+  = 
+  \begin{bmatrix}
+    u_1'(t_1) \cdots u_n'(t_1)\\
+    \vdots\\
+    u_1'(t_m) \cdots u_n'(t_m)\\
+  \end{bmatrix} 
+  \begin{bmatrix}
+    \phi_{11} \cdots \phi_{1n}\\
+    \vdots\\
+    \phi_{m1} \cdots \phi_{mn}\\
+  \end{bmatrix} 
+  ,
+\end{equation}
+where $a_{ij}$ is the projection of the data measured at time i onto the mode j. \newline
+
+We can express the dataset $\bm{U}$ as the sum of the contributions from n modes as 
+$\bm{U} = \bm{A} \bm{\Phi}^T$ as
+\begin{equation}
+  \begin{bmatrix}
+    u_1'(t_1) \cdots u_n'(t_1)\\
+    \vdots\\
+    u_1'(t_m) \cdots u_n'(t_m)\\
+  \end{bmatrix} 
+  =
+  \begin{bmatrix}
+    a_{11}\\
+    \vdots\\
+    a_{m1}\\
+  \end{bmatrix} 
+  \begin{bmatrix}
+    \phi_{11} \cdots \phi_{n1}\\
+  \end{bmatrix}
+  +
+  \cdots 
+  +
+  \begin{bmatrix}
+    a_{1n}\\
+    \vdots\\
+    a_{mn}\\
+  \end{bmatrix} 
+  \begin{bmatrix}
+    \phi_{1n} \cdots \phi_{nn}\\
+  \end{bmatrix}
+  \simeq \sum_{k=1}^n\bm{\tilde{U}}^k.
+\end{equation}
+
+We have decomposed our original dataset into a sum of n contributions from n proper 
+orthogonal modes.\newline
+
+When the dimension $n \gg m$ (the number of samples is larger than the number of measurements)
+we can apply the \textbf{SNAPSHOT POD}.
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
+
