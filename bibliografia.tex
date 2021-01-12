@@ -11,6 +11,8 @@
  }
 
 \title{Model Order Reduction for linear structural dynamics}
+\author{Miguel Calpe Linares}
+\date{}
 
 \begin{document}
 \maketitle
@@ -30,7 +32,23 @@ where $\bm{M}_r=\bm{V}^T\bm{M}\bm{V}$ and $\bm{K}_r=\bm{V}^T\bm{K}\bm{V}$ are th
 stiffness matrix. The equation \ref{eq:reduced_linear_equation} is a linear independent 
 system of equations with a reduced order $r$.\newline
 
-Goal: compute operator $\bm{V}$.
+Goal: compute operator $\bm{V}$.\newline
+
+\textbf{List of methods}
+
+\begin{center}
+  \begin{tabular}{||c c c ||} 
+  \hline
+  Method & linear/non-linear & Model \\ [0.5ex] 
+  \hline\hline
+  Modal truncation & Linear systems & Theory-based \\ 
+  \hline
+  Krylov & Linear (force inputs) & Theory-based \\ 
+  \hline
+  POD & Non-linear \& linear & Data-based \\ 
+  \hline
+ \end{tabular}
+ \end{center}
 
 \section{Modal truncation}
 Source: see references \cite{rutzmoser18}. \newline 
@@ -148,7 +166,8 @@ Modal Truncation Augmentation combine the advantages of modal truncation method 
 Krylov subspace reduction. 
 
 \section{Proper Orthogonal Decomposition}
-Sources \cite{weiss19}.\newline
+Proper Orthogonal decomposition is applied in fluid mechanics \cite{weiss19,lassila14,taira17,berkooz13} and in structural mechanics \cite{thiene11, feeny98} \newline
+
 
 Appropiate to non-linear systems. \newline
 
@@ -191,6 +210,8 @@ We can compute the covariance matrix as
     .
 \end{equation}
 
+The proper orthogonal basis is formed with the vectors which maximizes the variance (representation of the data) and the covariance between vectors 
+should be ideally zero. In order to compute this proper orthogonal basis, we compute the eigenvectors of the covariance matrix. \newline
 We compute the eigenvectors and eigenvalues of matrix $\bm{C}$. Since $\bm{C}$ is symmetric,
 the eigenvectors necessarly form a orthonormal basis in which $\bm{C}$ can be diagonalized. 
 Formally, the covariance matrix is diagonalized as 
@@ -272,10 +293,12 @@ $\bm{U} = \bm{A} \bm{\Phi}^T$ as
 We have decomposed our original dataset into a sum of n contributions from n proper 
 orthogonal modes.\newline
 
-When the dimension $n \gg m$ (the number of samples is larger than the number of measurements)
-we can apply the \textbf{SNAPSHOT POD}.
+When the dimension $n \gg m$ (the number of samples is larger than the number of measurements), the dimension of the covariance matrix is $n \times n$, which is very large. We can apply the \textbf{SNAPSHOT POD} approach. The  covariance matrix will be with a size $m \times m$. \newline
 
-\bibliographystyle{unsrt}
+\textbf{GALERKIN PROJECTION}. Model reduction via POD can also be used to generate a set of ordinary diferential equations (a fnite-dimensional dynamical system) as a simplifcation of the partial diferential equations normally used to solve fuid-mechanics problems.
+
+
+\bibliographystyle{apalike}
 \bibliography{references}
 
 \end{document}
