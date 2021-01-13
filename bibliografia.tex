@@ -2,6 +2,7 @@
 \usepackage{amsmath}
 \usepackage{bm}
 \usepackage{amssymb}
+\usepackage{hyperref}
 \usepackage{geometry}
  \geometry{
  a4paper,
@@ -296,6 +297,19 @@ orthogonal modes.\newline
 When the dimension $n \gg m$ (the number of samples is larger than the number of measurements), the dimension of the covariance matrix is $n \times n$, which is very large. We can apply the \textbf{SNAPSHOT POD} approach. The  covariance matrix will be with a size $m \times m$. \newline
 
 \textbf{GALERKIN PROJECTION}. Model reduction via POD can also be used to generate a set of ordinary diferential equations (a fnite-dimensional dynamical system) as a simplifcation of the partial diferential equations normally used to solve fuid-mechanics problems.
+
+\section{Kratos framework}
+Reference \cite{halko10} and good explanation with Python implementation \url{https://towardsdatascience.com/intuitive-understanding-of-randomized-singular-value-decomposition-9389e27cb9de}.\newline
+
+The task of computing a low-rank approximation to a given matrix can be split into two computational stages:
+
+\begin{itemize}
+  \item \textbf{Stage A}. Construct a low-dimensional subspace that captures the action of the matrix. Compute the basis $\bm{Q}$ orthonormal and $\bm{A} \simeq \bm{Q}\bm{Q}^*\bm{A}$. The computation $\bm{Q}$ can be performed with random sampling methods. 
+  \item \textbf{Stage B}. Given a matrix $\bm{Q}$, we compute a standard factorization (QR, SVD) of A.
+\end{itemize}
+
+With $\bm{Q}$ we have $\bm{A} \simeq \bm{Q}\bm{Q}^*\bm{A}$, where the SVD of  $\bm{A} \simeq \bm{U}\bm{\Sigma}\bm{V}^*$ . We can obtain $\bm{B} = \bm{Q}^*\bm{A}$. We apply SVD to $\bm{B} = \bm{\tilde{U}} \bm{\tilde {\Sigma}} \bm{\tilde{V}}^*$. We can obtain $\bm{U} = \bm{Q}\bm{\tilde{U}}$
+
 
 
 \bibliographystyle{apalike}
