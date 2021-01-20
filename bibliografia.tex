@@ -1,8 +1,10 @@
 \documentclass{article}
 \usepackage{amsmath}
-\usepackage{bm}
-\usepackage{amssymb}
-\usepackage{hyperref}
+\usepackage{bm} % Bold math
+\usepackage{amssymb} 
+\usepackage{hyperref} % References and url
+\usepackage{graphicx} % To insert images
+\usepackage{listings} % To insert code
 \usepackage{geometry}
  \geometry{
  a4paper,
@@ -10,6 +12,8 @@
  left=20mm,
  top=20mm,
  }
+
+ \graphicspath{ {./figures/} }
 
 \title{Model Order Reduction for linear structural dynamics}
 \author{Miguel Calpe Linares}
@@ -298,17 +302,93 @@ When the dimension $n \gg m$ (the number of samples is larger than the number of
 
 \textbf{GALERKIN PROJECTION}. Model reduction via POD can also be used to generate a set of ordinary diferential equations (a fnite-dimensional dynamical system) as a simplifcation of the partial diferential equations normally used to solve fuid-mechanics problems.
 
-\section{Kratos framework}
-Reference \cite{halko10} and good explanation with Python implementation \url{https://towardsdatascience.com/intuitive-understanding-of-randomized-singular-value-decomposition-9389e27cb9de}.\newline
+\section{Randomized Singular Value Decomposition (rSVD)}
 
-The task of computing a low-rank approximation to a given matrix can be split into two computational stages:
+KRATOS framework uses the rSVD approach and it is based on the reference \cite{halko10}.\newline
 
+Python implementation with a good explanation: \url{https://towardsdatascience.com/intuitive-understanding-of-randomized-singular-value-decomposition-9389e27cb9de}.\newline
+
+More references of the rSVD with good explanation are in \cite{erichson16}.\newline
+
+Key: Compute a low-rank approximation to a given matrix $\bm{A}$\newline
+
+The low-approximation is performed through Singular Value Decomposition with a randomized algorithm.\newline
+
+The Singular Value Decomposition of a given marix $\bm{A}$ is
+\begin{equation}
+  \bm{A} = \bm{U}\bm{\Sigma}\bm{V}^*.
+\end{equation}
+
+The steps to perform a randomized SVD to matrix $\bm{A} \in \mathbb{R}^{m \times n}$ are:
+
+1. We generate a Gaussian random matrix $\bm{\Omega} \in \mathbb{R}^{n \times k}$ with $k<m,n$.
+
+2. Compute the new matrix $\bm{Y} = \bm{A}\bm{\Omega} \in \mathbb{R}^{m \times k}$
+
+3. Apply the QR decomposition to $\bm{Y} = \bm{Q} \bm{R}$ where $\bm{Q} \in \mathbb{R}^{m \times k}$ and $\bm{R} \in \mathbb{R}^{k \times k}$. $\bm{Q}$ is an orthogonal matrix. 
+
+\begin{figure}[h!]
+  \begin{center}
+  \includegraphics[width=0.6 \linewidth]{rsvd_orthogonal_basis.png}
+  \caption{Obtention of the orthogonal matrix $\bm{Q}$.}
+  \label{fig:rsvd_orthogonal_basis}
+  \end{center}
+\end{figure}
+
+4. Compute a new matrix as $\bm{B} = \bm{Q}^*\bm{A} \in \mathbb{R}^{k \times n}$.
+
+5. Apply the SVD to $\bm{B}$ which is smaller than $\bm{A}$. $\bm{B} = \bm{\tilde{U}}\bm{\Sigma}\bm{V}^*$
+
+6. We can compute the left eigenvectors as $\bm{U} = \bm{Q}\bm{\tilde{U}}$
+
+\begin{figure}[h!]
+  \begin{center}
+  \includegraphics[width=0.6 \linewidth]{rsvd_factorization.png}
+  \caption{Factorization of a low-order matrix $\bm{B}$.}
+  \label{fig:factorization}
+  \end{center}
+\end{figure}
+
+\section{Artículos Joaquín Alberto Hernández}
+
+Sources \cite{hernandez14} \newline
+
+Input of interest (strain tensor) $\rightarrow$ FE analysis (snapshots matrix) $\rightarrow$ dimensionality reduction (POD modes).\newline
+
+Evaluation of integrals in p sampling points (reduced space $n_u$). Where to choose the sampling points? How to choose the weighting functions? \newline
+
+Model reduction approaches: (in both, the integrand is approximated by a linear combination of the reduced set of empirical modes)
 \begin{itemize}
-  \item \textbf{Stage A}. Construct a low-dimensional subspace that captures the action of the matrix. Compute the basis $\bm{Q}$ orthonormal and $\bm{A} \simeq \bm{Q}\bm{Q}^*\bm{A}$. The computation $\bm{Q}$ can be performed with random sampling methods. 
-  \item \textbf{Stage B}. Given a matrix $\bm{Q}$, we compute a standard factorization (QR, SVD) of A.
+  \item Interpolatory methods: coefficients are obtained by interpolation of a pre-selected sampling points by \textit{minimization interpolation error}
+  \item Election of the sampling points and weights by \textit{minimization integration error}
 \end{itemize}
 
-With $\bm{Q}$ we have $\bm{A} \simeq \bm{Q}\bm{Q}^*\bm{A}$, where the SVD of  $\bm{A} \simeq \bm{U}\bm{\Sigma}\bm{V}^*$ . We can obtain $\bm{B} = \bm{Q}^*\bm{A}$. We apply SVD to $\bm{B} = \bm{\tilde{U}} \bm{\tilde {\Sigma}} \bm{\tilde{V}}^*$. We can obtain $\bm{U} = \bm{Q}\bm{\tilde{U}}$
+Method to find POD modes of the displacements snapshots matrix $\bm{X_u}$ \newline
+
+The basis of the reduced order model will be such that
+\begin{equation}
+  \mathbb{V}_{u}^{snp} = \mathbb{V}_{u,el}^{snp} \oplus \mathbb{V}_{u,inel}^{snp},
+\end{equation}
+
+the sum of POD elastic modes and inelastic modes.\newline
+
+The procedure is the following:
+
+1. Linear elastic FE analysis to get the displacement fields
+
+2. Apply the POD method to obtain the reduced elastic basis $\mathbb{V}_{u,el}^{snp} = \{ \Phi_1, \cdots, \Phi_{me} \}$
+
+3. Compute the inelastic displacements field such that $u_{inel}^k = u^k - \sum_{i=1}^{m_e} <\Phi_i u^k> \Phi_i$
+
+4. Apply the POD method to $u_{inel}^k$ to compute the reduced basis of the inelastic regime $\mathbb{V}_{u,inel}^{snp} = \{ \Phi_{m_e+1}, \cdots, \Phi_{n_u} \}$
+
+
+\section{Possible collaborations}
+
+1. France Energies Marines. project SUBSEE 4D: development of a digital twin to run offshore floating wind turbine farms. \newline
+
+\url{https://www.france-energies-marines.org/projets/subsee-4d/}\newline
+
 
 
 
