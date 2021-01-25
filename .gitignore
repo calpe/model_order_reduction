@@ -7,3 +7,5 @@
 *.fls
 *.out
 *.gz
+*.png
+*.vtk
