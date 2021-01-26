@@ -351,8 +351,7 @@ The steps to perform a randomized SVD to matrix $\bm{A} \in \mathbb{R}^{m \times
 
 \section{Artículos Joaquín Alberto Hernández}
 
-Sources \cite{hernandez14} \newline
-
+\subsection{Model reduction techniques in multiscale homogenization. \cite{hernandez14}}
 Input of interest (strain tensor) $\rightarrow$ FE analysis (snapshots matrix) $\rightarrow$ dimensionality reduction (POD modes).\newline
 
 Evaluation of integrals in p sampling points (reduced space $n_u$). Where to choose the sampling points? How to choose the weighting functions? \newline
@@ -381,6 +380,43 @@ The procedure is the following:
 3. Compute the inelastic displacements field such that $u_{inel}^k = u^k - \sum_{i=1}^{m_e} <\Phi_i u^k> \Phi_i$
 
 4. Apply the POD method to $u_{inel}^k$ to compute the reduced basis of the inelastic regime $\mathbb{V}_{u,inel}^{snp} = \{ \Phi_{m_e+1}, \cdots, \Phi_{n_u} \}$
+
+\subsection{Hyper-reduction of nonlinear finite element models via empirical cubature. \cite{hernandez17}}
+
+The finite element semi-discrete motion equation we want to reduce is
+\begin{equation}
+  \bm{M^h} \bm{\ddot{d}}^h(\bm{\mu}) + \bm{F}^h(\bm{d}^h, \bm{d}_0^h; \bm{\mu}) = \bm{F}_{ext} \bm{\mu} - \bm{M}_0^h \bm{\ddot{d}}_0^h(\bm{\mu})
+\end{equation}
+
+\subsubsection{First reduction stage}
+Goal: obtain few global basis vectors.
+
+1. Solve FE problem with representative input parameter $\{\bm{\mu}^i\}_{i=1}^P$.
+
+2. Store the vectors: unrestricted nodal displacements $\bm{d}^h$, prescribed nodal displacements $\bm{d}_0^h$ and external nodal forces $\bm{F}^h_{ext}$ into the snapshot matrices $\bm{X}_d$, $\bm{X}_{d_0}$ and $\bm{X}_{F_ext}$.
+
+3. Apply the SVD to the snapshotmatrices $\bm{X}_d$, $\bm{X}_{d_0}$ and $\bm{X}_{F_ext}$ and obtain the reduced basis $\bm{\Phi} \in \mathbb{R}^{N \times n}$, $\bm{\Xi} \in \mathbb{R}^{N_0 \times n_0}$ and $\bm{\Theta} \in \mathbb{R}^{N \times n_f}$. We can apply the elastic/inelastic mode decomposition as in \cite{hernandez14}.
+
+4. Determine interpolation indices $b \subseteq \{1, \hdots, N_0 \}$ and $c \subseteq \{1, \hdots, N \}$ corresponding to basis matrices $\bm{\Xi}$ and $\bm{\Theta}$ by Discrete Empirical Interpolation Method (DEIM).
+
+5. Compute the reduced order matrices $\bm{\Phi}_0 = \bm{\Xi} \bm{\Xi}_b^{-1}$, $\bm{M} = \bm{\Phi}^T \bm{M}^h\bm{\Phi}$, $\bm{M}_0 = \bm{\Phi}^T \bm{M}_0^h\bm{\Phi}_0$, $\bm{R}_{ext} = \bm{\Phi}^T \bm{\Theta}\bm{\Theta}_0^{-1}$, $\bm{u}_0 = \bm{\Phi}^T \bm{u}_0^h$ and $\bm{v}_0 = \bm{\Phi}^T \bm{v}_0^h$. We obtain thus
+
+\begin{equation}
+  (\bm{\Phi}^T \bm{M^h}\bm{\Phi}) \bm{\ddot{d}}^h(\bm{\mu}) + \bm{\Phi}^T \bm{F}^h(\bm{d}^h, \bm{d}_0^h; \bm{\mu}) = \bm{\Phi}^T \bm{F}_{ext} \bm{\mu} - (\bm{\Phi}^T \bm{M}_0^h \bm{\Phi}) \bm{\ddot{d}}_0^h(\bm{\mu}).
+\end{equation}
+
+We can thus rewrite the equation as 
+\begin{equation}
+  \bm{M} \bm{\ddot{d}} + \bm{F} = \bm{F}_{ext} - \bm{M}_0 \bm{\ddot{d}}_0.
+\end{equation}
+
+where $\bm{F}$ is the nodal vector of the internal forces. It still depends of the mesh points M (M integration points). $\bm{F}$ can be written as
+\begin{equation}
+  \bm{F} = \int_\Omega f d\Omega \approx \sum_{g=1}^M W_g f(x_g)
+\end{equation}
+
+Goal: reduce the number of integration points from M to m ($m \ll M$). The question is how to choose the integration points? How to compute its associated weights?
+
 
 
 \section{Possible collaborations}
