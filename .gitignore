@@ -9,3 +9,4 @@
 *.gz
 *.png
 *.vtk
+.ipynb_checkpoints
