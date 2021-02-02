@@ -11,7 +11,9 @@ if __name__ == "__main__":
 
     # Define path results file
     path_root = Path("/home/usuari/Documentos/CIMNE/bibliografia/model_order_reduction/python_scripts")
-    name_file = "beam_simple.flavia.res"
+    # name_file = "beam_simple.flavia.res"
+    # name_file = "beam_simple.flavia_tstep1000_dt01.res"
+    name_file = "beam_simple_f01hz_dt01_tsteps800_msh005.flavia.res"
     path_file = path_root / name_file
 
     snapshot_matrix = create_snapshotmatrix_from_file(path_file)
