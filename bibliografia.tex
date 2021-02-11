@@ -417,7 +417,15 @@ where $\bm{F}$ is the nodal vector of the internal forces. It still depends of t
 
 Goal: reduce the number of integration points from M to m ($m \ll M$). The question is how to choose the integration points? How to compute its associated weights?
 
+\section{Tolerance in Kratos}
+The class RandomizedSingularValueDecomposition computes the rSVD of a snapshot matrix $\bm{A}$. The decomposition is written as
 
+\begin{equation}
+  \bm{A} = \bm{U} \bm{\Sigma} \bm{V}^T + \text{Error(truncation\_tolerance)},
+\end{equation}
+where the error is associated to the truncation of the matrices $\bm{U}$ and $\bm{\Sigma}$.\newline
+
+There is one parameter in Kratos, RELATIVE\_SVD. If RELATIVE\_SVD is True, the truncation\_tolerance is multiplied by the norm of the matrix $\bm{A}$. If RELATIVE\_SVD is False, the truncation\_tolerance is the absolute error tolerance. 
 
 \section{Possible collaborations}
 
