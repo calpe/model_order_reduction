@@ -6,16 +6,23 @@ Compute the snapshot matrix from one or a linear combination of eigenmodes of a 
 The eigenmodes (and eigenfrequencies) have been obtained from a modal analysis with RamSeries.
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
-path_file = '/home/usuari/Documentos/CIMNE/bibliografia/model_order_reduction/python_scripts/cantilever_eigenvalue.flavia.res'
+from pathlib import Path
+from KratosMultiphysics.RomApplication.randomized_singular_value_decomposition import RandomizedSingularValueDecomposition
+
+
+path_root = Path("/home/usuari/Documentos/CIMNE/bibliografia/model_order_reduction/python_scripts")
+name_file = "cantilever_eigenvalue.flavia.res"
+path_file = path_root / name_file
 
 f = open(path_file, "r")
 lines = f.readlines()
 f.close()
 
-# Choose the modes
-modes = [1]
-
+# Choose the q first modes
+q = 1
+modes = np.arange(1, q + 1)
 
 # Create list of time steps
 deg_freedom = 3  # displ_x, displ_y, displ_z
@@ -46,25 +53,49 @@ nb_time_steps = round(duration / dt_sampling)
 
 # Create snapshot matrix
 nb_nodes = len(values_list[0])
-snapshot_mtx = np.empty(shape=(len(modes), nb_nodes * deg_freedom, nb_time_steps))
+snapshot_mtx = np.empty(
+    shape=(len(modes), nb_nodes * deg_freedom, nb_time_steps))
 
 # Create array of time
 times = np.linspace(t_start, t_end, nb_time_steps)
 
-i_node_snapshot_mtx = 0
-
-## Buggy!
+# Compute the sinthetic field (sinusoidal for each node)
 for i_mode in np.arange(len(modes)):
-    for i_node in np.arange(nb_nodes)[:2]:
-        print(i_node)
-        displ_x = float(values_list[i_mode][i_node].split()[1]) * np.sin(0.8 * frequencies[i_mode] * 2 * np.pi * times)
-        displ_y = float(values_list[i_mode][i_node].split()[2]) * np.sin(0.8 * frequencies[i_mode] * 2 * np.pi * times)
-        displ_z = float(values_list[i_mode][i_node].split()[3]) * np.sin(0.8 * frequencies[i_mode] * 2 * np.pi * times)
+    i_node_snapshot_mtx = 0
+    for i_node in np.arange(nb_nodes):
+        displ_x = float(values_list[i_mode][i_node].split()[1]) * np.sin(
+            0.8 * frequencies[i_mode] * 2 * np.pi * times)
+        displ_y = float(values_list[i_mode][i_node].split()[2]) * np.sin(
+            0.8 * frequencies[i_mode] * 2 * np.pi * times)
+        displ_z = float(values_list[i_mode][i_node].split()[3]) * np.sin(
+            0.8 * frequencies[i_mode] * 2 * np.pi * times)
 
-        print(displ_z)
         # Add to snapshot matrix
         snapshot_mtx[i_mode, i_node_snapshot_mtx, :] = displ_x
         snapshot_mtx[i_mode, i_node_snapshot_mtx + 1, :] = displ_y
         snapshot_mtx[i_mode, i_node_snapshot_mtx + 2, :] = displ_z
 
-        i_node_snapshot_mtx = i_node + 3
+        # Update index of the snapshot matrix
+        i_node_snapshot_mtx = i_node_snapshot_mtx + 3
+
+
+# Plot
+SNAPSHOT_MATRIX = np.sum(snapshot_mtx, axis=0)
+fig, ax = plt.subplots()
+ax.set_xlabel("time (s)")
+ax.set_ylabel("displacement (m)")
+
+plt.plot(times, SNAPSHOT_MATRIX[1, :], color="red")
+
+# Apply Kratos tools
+tolerance = 1e-6
+u, s, v, _ = RandomizedSingularValueDecomposition().Calculate(
+    SNAPSHOT_MATRIX, tolerance)
+
+
+# Validation...
+svd = s[0] * u * v.T
+
+plt.plot(times, svd[1, :], "o", color="blue")
+
+plt.show()
