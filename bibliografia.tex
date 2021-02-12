@@ -417,6 +417,64 @@ where $\bm{F}$ is the nodal vector of the internal forces. It still depends of t
 
 Goal: reduce the number of integration points from M to m ($m \ll M$). The question is how to choose the integration points? How to compute its associated weights?
 
+\newpage
+\section{Modal analysis undamped free vibrations}
+In this section, I perform a modal analysis of a undamped free vibrating structure. We consider the following equation of motion
+\begin{equation}
+  \bm{M}\bm{\ddot{u}} + \bm{K}\bm{u} = 0.
+  \label{eq:modal_analysis_motion_equation}
+\end{equation}
+
+We consider a solution such that
+\begin{equation}
+  \bm{u} = \bm{\phi} e^{i \omega t}.
+\end{equation}
+
+The acceleration is thus written as
+\begin{equation}
+  \bm{\ddot{u}} = -\omega^2 \bm{\phi} e^{i \omega t}.
+\end{equation}
+
+Introducing $\bm{u}$ qnd $\bm{\ddot{u}}$ into the equation \ref{eq:modal_analysis_motion_equation} we obtain the following expression
+\begin{equation}
+  (\bm{K} - \omega^2 \bm{M}) \bm{\phi} = 0.
+\end{equation}
+
+The solution $\bm{\phi} = 0$ is trivial. We are interested in solutions with $\bm{\phi} \neq 0$. We can thus write the above expression as
+\begin{equation}
+  (\bm{M}^{-1}\bm{K})\bm{\phi} = \omega^2 \bm{\phi},
+\end{equation}
+where $\bm{\phi}$ are the eigenvectors and $\lambda = \omega^2$ are the eigenvalues of the operator $\bm{M}^{-1}\bm{K}$. 
+
+\subsection*{Validation rSVD of Kratos}
+This section compares the displacement of one node and the displacement of the node reconstructed with rSVD tools of KRATOS.\newline
+
+I have performed a modal analysis of a free cantilever beam with RamSeries. I computed the first 10 eigenmodes $\{\bm{\phi}_1, \dots, \bm{\phi}_{10}\}$ and the 10 eigenfrequencies $\{ \omega_1, \dots, \omega_{10} \}$.\newline
+
+\noindent \textbf{case: 1 mode}
+
+I construct the snapshot matrix with displacement field computed with the 1st mode and natural frequency such as 
+\begin{equation}
+  \bm{X}_d = \bm{\phi}_1 e^{i \omega_1 t}.
+\end{equation}
+
+I apply the Kratos tools to compute the rSVD of $\bm{X}_d$. I obtain $\sigma_1$, $\bm{\phi}'_1$ and $\bm{\theta}'_1$.\newline
+
+The displacement of the node should be the same as the reconstructed with the rSVD such that
+\begin{equation}
+  \bm{\phi}_1 e^{i \omega_1 t} = \sigma_1 \bm{\phi}'_1 \bm{\theta}^{'T}_1. 
+\end{equation}
+
+\noindent \textbf{case: n-modes}
+
+The displacement constructed with n linear modes should be the same as the reconstructed with the rSVD such that 
+
+\begin{equation}
+  \sum_{i=1}^n \bm{\phi}_i e^{i \omega_i t} = \sum_{i=1}^n \bm{\sigma}_i \bm{\phi}'_i \bm{\theta}^{'T}_i. 
+\end{equation}
+
+
+\newpage
 \section{Tolerance in Kratos}
 The class RandomizedSingularValueDecomposition computes the rSVD of a snapshot matrix $\bm{A}$. The decomposition is written as
 
@@ -432,8 +490,6 @@ There is one parameter in Kratos, RELATIVE\_SVD. If RELATIVE\_SVD is True, the t
 1. France Energies Marines. project SUBSEE 4D: development of a digital twin to run offshore floating wind turbine farms. \newline
 
 \url{https://www.france-energies-marines.org/projets/subsee-4d/}\newline
-
-
 
 
 \bibliographystyle{apalike}
