@@ -5,10 +5,9 @@ create_snapshotmatrix_from_ascii_file.py
 Script to compute the snapshot matrix from an output ascii file from Compass.
 """
 # Import libraries
+import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
-
-from pathlib import Path
 
 
 def create_snapshotmatrix_from_file(path_file):
@@ -56,7 +55,8 @@ def create_snapshotmatrix_from_file(path_file):
     return snapshot_mtx
 
 
-def plot_displacements_time_per_node(snapshot_matrix, deg_freedom=3, nb_nodes_decimation=20):
+def plot_displacements_time_per_node(
+        snapshot_matrix, deg_freedom=3, nb_nodes_decimation=20):
     """
     Plot displacements as function of time per node.
     Only implemented for the output file: 
@@ -86,7 +86,7 @@ def plot_displacements_time_per_node(snapshot_matrix, deg_freedom=3, nb_nodes_de
 if __name__ == "__main__":
 
     # Define path results file
-    path_root = Path("/home/usuari/Documentos/CIMNE/bibliografia/model_order_reduction/python_scripts")
+    path_root = pathlib.Path().absolute()
     # name_file = "beam_simple.flavia.res"
     name_file = "beam_simple_f01hz_dt01_tsteps800_msh005.flavia.res"
     path_file = path_root / name_file
@@ -98,6 +98,7 @@ if __name__ == "__main__":
     if name_file == "beam_simple_f01hz_dt01_tsteps800_msh005.flavia.res":
         fig, ax = plot_displacements_time_per_node(snapshot_matrix)
     else:
-        print("Plot only implemented for output file beam_simple_f01hz_dt01_tsteps800_msh005.flavia.res")
+        print(
+            "Plot only implemented for output file          beam_simple_f01hz_dt01_tsteps800_msh005.flavia.res")
 
     plt.show()

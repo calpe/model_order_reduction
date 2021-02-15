@@ -5,10 +5,10 @@ Compute the snapshot matrix from one or a linear combination of eigenmodes of a 
 
 The eigenmodes (and eigenfrequencies) have been obtained from a modal analysis with RamSeries.
 """
+import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pathlib import Path
 from KratosMultiphysics.RomApplication.randomized_singular_value_decomposition import RandomizedSingularValueDecomposition
 
 
@@ -94,7 +94,8 @@ def reconstruct_displacement_from_modes(
 
 if __name__ == "__main__":
 
-    path_root = Path("/home/usuari/Documentos/CIMNE/bibliografia/model_order_reduction/python_scripts")
+    # Define the path of the file
+    path_root = pathlib.Path().absolute()
     name_file = "cantilever_eigenvalue.flavia.res"
     path_file = path_root / name_file
 
