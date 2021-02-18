@@ -417,7 +417,7 @@ where $\bm{F}$ is the nodal vector of the internal forces. It still depends of t
 
 Goal: reduce the number of integration points from M to m ($m \ll M$). The question is how to choose the integration points? How to compute its associated weights?
 
-\newpage
+
 \section{Modal analysis undamped free vibrations}
 In this section, I perform a modal analysis of a undamped free vibrating structure. We consider the following equation of motion
 \begin{equation}
@@ -475,8 +475,51 @@ The displacement constructed with n linear modes should be the same as the recon
   \sum_{i=1}^n \bm{\phi}_i e^{i \omega_i t} = \sum_{i=1}^n \bm{\sigma}_i \bm{\phi}'_i \bm{\theta}^{'T}_i. 
 \end{equation}
 
+\section{Which matrix norm to choose?}
+We consider $\bm{A^d}$ the snapshot matrix with the displacements. \newline
 
-\newpage
+The Singular Value Decomposition of the snapshot matrix $\bm{A^d}$ can be written as
+
+\begin{equation}
+  \bm{A}^d = U \Sigma U =\sum_{i=1}^p \sigma_i \bm{U}_i \bm{V}_i^T,  
+\end{equation}
+
+The truncated SVD can be written as
+\begin{equation}
+  \bm{A}^d = \sum_{i=1}^r \bm{U}_i \sigma_i \bm{V}_i^T + E,
+\end{equation}
+where $\bm{U}_i$, $\sigma_i$ and $\bm{V}_i$ are the left singular vectors, singular values and right singular vectors respectively. The singular vectors satisfy $\bm{U}_i^T\bm{U}_i=\delta_{ij}$, $\bm{V}_i^T\bm{V}_i=\delta_{ij}$, and $\lambda_i \geq \lambda_{i+1} \geq 0$. \newline
+
+The reduced basis matrix $\bm{\Phi}$ will be composed of the r first singular vectors $\bm{U}_1, \dots, \bm{U}_r$. The number r will be chosen such that 
+\begin{equation}
+  ||\bm{A}^d - \text{SVD}(\bm{A}^d)||_F^2 \leq \epsilon^{d^2} ||\bm{A}^d||_F^2,
+  \label{eq:norm_matrix}
+\end{equation}
+where $||\bm{A}^d||_F^2$ is the square of the Frobenius norm. It can be interpreted as the strain energy. The strain energy scales as $E_{A^d} \sim \varepsilon^2 \sim u^2$, where $u$ is the displacement.\newline
+
+The number of r-first singulars vectors are chosen such that satisfy the following expression
+\begin{equation}
+ \sum_{i=r+1}^p \lambda_i^2 \leq \epsilon^{d^2} \sum_{i=1}^p.
+\end{equation}
+
+\section{Case: load case with multiple amplitudes}
+We consider a load case $Q = \sum_{i=1}^q A_i \phi_i e^{i \omega_i t}$, where $\phi_i$ are the eigenmodes and $\omega_i$ natural frequencies. \newline
+
+The Singular Value Decomposition of the load case $Q$ is 
+\begin{equation}
+  Q = \sum_{i=1}^q \sigma_i \phi_i \theta_i^T.
+\end{equation}
+
+It is also true that the SVD of $Q$ is
+\begin{equation}
+  Q = \sum_{i=1}^q A_i \phi_i e^{i \omega_i t} = \sum_{i=1}^q A_i \sigma_i' \phi_i \theta_i^T.
+\end{equation}
+
+In order to get the same contribution of all singular modes
+\begin{equation}
+  \sigma_i' = \frac{\sigma_i}{A_i}
+\end{equation}
+
 \section{Tolerance in Kratos}
 The class RandomizedSingularValueDecomposition computes the rSVD of a snapshot matrix $\bm{A}$. The decomposition is written as
 
