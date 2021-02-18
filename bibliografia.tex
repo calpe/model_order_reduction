@@ -435,7 +435,7 @@ The acceleration is thus written as
   \bm{\ddot{u}} = -\omega^2 \bm{\phi} e^{i \omega t}.
 \end{equation}
 
-Introducing $\bm{u}$ qnd $\bm{\ddot{u}}$ into the equation \ref{eq:modal_analysis_motion_equation} we obtain the following expression
+Introducing $\bm{u}$ and $\bm{\ddot{u}}$ into the equation \ref{eq:modal_analysis_motion_equation} we obtain the following expression
 \begin{equation}
   (\bm{K} - \omega^2 \bm{M}) \bm{\phi} = 0.
 \end{equation}
@@ -444,7 +444,9 @@ The solution $\bm{\phi} = 0$ is trivial. We are interested in solutions with $\b
 \begin{equation}
   (\bm{M}^{-1}\bm{K})\bm{\phi} = \omega^2 \bm{\phi},
 \end{equation}
-where $\bm{\phi}$ are the eigenvectors and $\lambda = \omega^2$ are the eigenvalues of the operator $\bm{M}^{-1}\bm{K}$. 
+where $\bm{\phi}$ are the matrix with the eigenvectors in columns and $\lambda = \omega^2$ are the eigenvalues of the operator $\bm{M}^{-1}\bm{K}$. \newline
+
+The eigenvectors are orthogonal. They satisfy $\phi_i^T \bm{M} \phi_j = 0$ and $\phi_i^T \bm{K} \phi_j = 0$ if $i=j$, and $\phi_i^T \bm{M} \phi_j \neq 0$ and $\phi_i^T \bm{K} \phi_j \neq 0$ if $i \neq j$. 
 
 \subsection*{Validation rSVD of Kratos}
 This section compares the displacement of one node and the displacement of the node reconstructed with rSVD tools of KRATOS.\newline
