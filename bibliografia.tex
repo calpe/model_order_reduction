@@ -327,13 +327,13 @@ The steps to perform a randomized SVD to matrix $\bm{A} \in \mathbb{R}^{m \times
 
 3. Apply the QR decomposition to $\bm{Y} = \bm{Q} \bm{R}$ where $\bm{Q} \in \mathbb{R}^{m \times k}$ and $\bm{R} \in \mathbb{R}^{k \times k}$. $\bm{Q}$ is an orthogonal matrix. 
 
-\begin{figure}[h!]
-  \begin{center}
-  \includegraphics[width=0.6 \linewidth]{rsvd_orthogonal_basis.png}
-  \caption{Obtention of the orthogonal matrix $\bm{Q}$.}
-  \label{fig:rsvd_orthogonal_basis}
-  \end{center}
-\end{figure}
+% \begin{figure}[h!]
+  % \begin{center}
+  % \includegraphics[width=0.6 \linewidth]{rsvd_orthogonal_basis.png}
+  % \caption{Obtention of the orthogonal matrix $\bm{Q}$.}
+  % \label{fig:rsvd_orthogonal_basis}
+  % \end{center}
+% \end{figure}
 
 4. Compute a new matrix as $\bm{B} = \bm{Q}^*\bm{A} \in \mathbb{R}^{k \times n}$.
 
@@ -341,13 +341,13 @@ The steps to perform a randomized SVD to matrix $\bm{A} \in \mathbb{R}^{m \times
 
 6. We can compute the left eigenvectors as $\bm{U} = \bm{Q}\bm{\tilde{U}}$
 
-\begin{figure}[h!]
-  \begin{center}
-  \includegraphics[width=0.6 \linewidth]{rsvd_factorization.png}
-  \caption{Factorization of a low-order matrix $\bm{B}$.}
-  \label{fig:factorization}
-  \end{center}
-\end{figure}
+% \begin{figure}[h!]
+  % \begin{center}
+  % \includegraphics[width=0.6 \linewidth]{rsvd_factorization.png}
+  % \caption{Factorization of a low-order matrix $\bm{B}$.}
+  % \label{fig:factorization}
+  % \end{center}
+% \end{figure}
 
 \section{Artículos Joaquín Alberto Hernández}
 
@@ -416,6 +416,103 @@ where $\bm{F}$ is the nodal vector of the internal forces. It still depends of t
 \end{equation}
 
 Goal: reduce the number of integration points from M to m ($m \ll M$). The question is how to choose the integration points? How to compute its associated weights?
+
+\section{Modal analysis}
+In this section, I explain the modal analysis of a structure described by the following equation of motion
+\begin{equation}
+  \bm{M}\bm{\ddot{u}} + \bm{K}\bm{u} = 0,
+  \label{eq:modal_analysis_motion_eq}
+\end{equation}
+where $u$ is the nodal displacement vector, $\bm{M}$ and $\bm{K}$ are the mass and stiffness matrices respectively.
+
+The displacement vector can be written as
+\begin{equation}
+  \bm{u} = \bm{\phi} e^{i \omega t}.
+\end{equation}
+
+The acceleration is thus expressed as
+\begin{equation}
+  \bm{\ddot{u}} = -\omega^2 \bm{\phi} e^{i \omega t}.
+\end{equation}
+
+Introducing the expressions of $\bm{u}$ and $\bm{\ddot{u}}$ into the equation \ref{eq:modal_analysis_motion_eq}, we obtain the following expression
+\begin{equation}
+  (\bm{K} - \omega^2 \bm{M}) \bm{\phi} = 0,
+\end{equation}
+and thus
+\begin{equation}
+  (\bm{M}^{-1}\bm{K})\bm{\phi} = \omega^2 \bm{\phi},
+\end{equation}
+where $\bm{\phi}$, $\lambda = \omega^2$ are the eigenvector and eigenvalue of the operator $\bm{M}^{-1}\bm{K}$.\newline
+
+The modal analysis aims to find the eigenvectors $\bm{\phi}_i$ and eigenvalues $\lambda_i$ of the operator $\bm{M}^{-1}\bm{K}$.\newline
+
+\noindent \textbf{The eigenvectors are orthogonal.}\newline
+\noindent We consider the matrix $\bm{\Phi}$ composed of the eigenvectors $\bm{\phi}_i$ in columns.\newline
+
+The eigenvectors are orthogonal. By orthogonality, the matrix $\bm{\Phi}$ satisfies
+\begin{align*}
+  % \bm{\Phi}^T \bm{M} \bm{\Phi}&=\bm{I} & \bm{\Phi}^T \bm{K} \bm{\Phi}=0\\
+  \bm{\Phi}^T \bm{M} \bm{\Phi} = \begin{bmatrix}
+      m_1 & 0 & 0\\
+      0 & \ddots & 0 \\
+      0 & 0 & m_n
+    \end{bmatrix}
+    \hspace{1cm}
+    \bm{\Phi}^T \bm{K} \bm{\Phi} = \begin{bmatrix}
+      m_1 \omega_1^2 & 0 & 0\\
+      0 & \ddots & 0 \\
+      0 & 0 & m_n \omega_n^2
+    \end{bmatrix}.
+  \end{align*}
+  
+Usually we normalize the eigenvectors such that 
+\begin{align*}
+  % \bm{\Phi}^T \bm{M} \bm{\Phi}&=\bm{I} & \bm{\Phi}^T \bm{K} \bm{\Phi}=0\\
+  \bm{\Phi}^T \bm{M} \bm{\Phi} = \begin{bmatrix}
+      1 & 0 & 0\\
+      0 & \ddots & 0 \\
+      0 & 0 & 1
+    \end{bmatrix}
+    \hspace{1cm}
+    \bm{\Phi}^T \bm{K} \bm{\Phi} = \begin{bmatrix}
+      \omega_1^2 & 0 & 0\\
+      0 & \ddots & 0 \\
+      0 & 0 &  \omega_n^2
+    \end{bmatrix}.
+  \end{align*}
+
+\noindent \textbf{Solution as linear combination of the eigenvectors.}\newline
+\noindent We consider the nodal displacement as a linear combination of the eigenvectors
+\begin{equation}
+  \bm{u} = \sum_{i=1}^n q_i(t) \bm{\phi}_i = \bm{\Phi}\bm{q},
+  \label{eq:linear_combination}
+\end{equation}
+where $q_i(t)$ is the amplitude of the i-eigenvector $\bm{\phi}_i$.\newline
+
+We consider the equation of motion 
+\begin{equation}
+  \bm{M}\bm{\ddot{u}} + \bm{K}\bm{u} = \bm{f},
+  \label{eq:equation_motion_force}
+\end{equation}
+where $\bm{f}$ is the nodal force vector. \newline
+
+Applying the solution \ref{eq:linear_combination} into the equation \ref{eq:equation_motion_force}, we obtain
+\begin{equation}
+  \bm{M}\bm{\Phi}\bm{\ddot{q}} + \bm{K}\bm{\Phi}\bm{q} = \bm{f}.
+\end{equation}
+
+We multiply by $\bm{\Phi}^T$ the above expression
+\begin{equation}
+  \bm{\Phi}^T\bm{M}\bm{\Phi}\bm{\ddot{q}} + \bm{\Phi}^T\bm{K}\bm{\Phi}\bm{q} = \bm{\Phi}^T\bm{f}.
+\end{equation}
+
+It the eigenvectors are mass-normalized, the above equation becomes
+\begin{equation}
+  \bm{\ddot{q}} + \bm{\Omega}\bm{q} = \bm{\Phi}^T\bm{f},
+  \label{eq:modal_equation}
+\end{equation}
+where $\Omega$ is the diagonal matrix with the eigenvalues $\lambda_i = \omega_i^2$ in the diagonal, and $\bm{\Phi}^T\bm{f}$ is the projection of the force vector onto the subspace composed of the eigenvectors. 
 
 
 \section{Modal analysis undamped free vibrations}
