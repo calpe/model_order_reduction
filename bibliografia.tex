@@ -513,6 +513,30 @@ It the eigenvectors are mass-normalized, the above equation becomes
 \end{equation}
 where $\Omega$ is the diagonal matrix with the eigenvalues $\lambda_i = \omega_i^2$ in the diagonal, and $\bm{\Phi}^T\bm{f}$ is the projection of the force vector onto the subspace composed of the eigenvectors. 
 
+\section{Modal analysis combined with SVD \cite{hernandez17}}
+Hypothesis: small strains and small nonlinear vibration problems.\newline
+
+Use the first $n^{\text{vib}}$ natural vibration modes, and determine the remaining modes using a weighted SVD (minimization norm the mass matrix $\bm{M}$).\newline
+
+We consider that we have the first $n^{\text{vib}}$ natural vibration modes , from the eigenvalue problem, gathered in the matrix $\bm{\Phi}^{\text{vib}}$. We need to compute $\bm{\Phi}^{\perp}$. \newline
+
+We compute the Cholesky decomposition of the mass matrix $\bm{M} = \bar{\bm{M}} \bar{\bm{M}}^T$, where $\bar{\bm{M}}$ is a lower triangular matrix.\newline
+
+We compute the truncated SVD of rank $n^\perp$ of the matrix defined as
+\begin{equation}
+  \bar{\bm{X}} = \bar{\bm{M}}(\bm{X_d} - \bm{\Phi}^{\text{vib}}(\bm{\Phi}^{\text{vib,T}} \bm{M} \bm{X_d})),
+\end{equation}
+where $\bm{X_d}$ is the snapshot matrix. The modes $\bm{\Phi}^{\perp}$ can be written as
+\begin{equation}
+  \bm{\Phi}^{\perp} = \bar{\bm{M}}^{-1}\bar{U},
+\end{equation}
+where $\bar{U}$ is the matrix with the left singular vectors of the above mentioned SVD.\newline
+
+The basis matrix for the displacements 
+\begin{equation}
+  \bm{\Phi} = [\bm{\Phi}^{\text{vib}} \bm{\Phi}^{\perp}]
+\end{equation}
+is $\bm{M}$-orthonormal.
 
 \section{Modal analysis undamped free vibrations}
 In this section, I perform a modal analysis of a undamped free vibrating structure. We consider the following equation of motion
