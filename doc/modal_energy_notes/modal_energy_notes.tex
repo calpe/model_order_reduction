@@ -1,0 +1,113 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{mathbbol}
+
+\title{Notes on modal energy}
+\author{Miguel Calpe Linares}
+\date{July 2021}
+
+\begin{document}
+\maketitle
+The equation of motion for a structure is 
+\begin{equation}
+    M \ddot{u} + K u = F,
+\label{eq:motion_equation}
+\end{equation}
+where $M$ and $K$ are the mass and stiffness matrices, $u$ is the displacement vector and and $F$ is the forcing term.\newline
+
+The energy of the structure can be scaled as $E \sim u^2$. \newline
+
+We consider a displacement vector solution as a sinusoidal solution $u = \phi e^{i \omega t}$, where $\phi$ is an amlitude of the displacement, and $\omega$ is a frequency. Hence, the energy (quadratic term of the displacement) can be expressed as
+\begin{equation}
+    E \sim u^2 = \phi^2 e^{2 i \omega t}.
+\end{equation}
+
+The first time derivative of the energy is $dE/dt = \phi^2 2 i \omega e^{2 i \omega t} $. The second time derivative of the energy is $d^2/dt^2 = - 4 \phi^2 \omega^2 e^{2 i \omega t}$. \newline
+
+Applying the second time derivative in the quadratic form of the equation \ref{eq:motion_equation}, we obtain
+
+\begin{equation}
+    -M \phi^2 4 \omega^2 e^{2 i \omega t} + K \phi^2 e^{2 i \omega t} = 0,
+\end{equation}
+and we obtain the following eigenvalue equation for the energy
+
+\begin{equation}
+    (K - 4 \omega^2 M) \phi^2 = (K- \delta M)\mu = 0.
+\end{equation}
+
+where $\delta$ are the eigenvalues and $\mu$ are the eigenvectors of the operator $(M^{-1}K)$. We can observe that the eigenvalues $\delta$ are 4 times larger than the eigenvalues for the motion equation $\delta = 4 \lambda$. The eigenvectors $\mu$ are the square of the eigenvectors for the motion equation $\mu =\phi^2$.\newline
+
+We consider that the energy can be expressed as a linear combination of the temporal coefficients and eigenmodes $E(t) = \sum \xi_i(t) \mu_i$, where $\xi(t)$ are temporal coefficients. By applying the energy to the quadratic form of \ref{eq:motion_equation}, we obtain
+\begin{equation}
+    M \ddot{\xi} \mu + K \xi \mu = F.
+\end{equation}
+
+We multiply the above expression by $\mu^T$ and we obtain
+\begin{equation}
+    \mu^T M \ddot{\xi} \mu + \mu^T K \xi \mu = \mu^T F. 
+\end{equation}
+
+We consider that the eigenvectors $\phi$ are normalized by the mass matrix $M$. The eigenvectors $\mu = \phi^2$ are thus mass normalized. $\phi$ is a orthogonal base, we know that $\mu = \phi^2$ is also a orthogonal base. 
+\begin{equation}
+    \mu^T M \mu = \phi^T \phi^T M \phi \phi = \phi^T \phi = \mathbb{1}.
+\end{equation}
+
+Thus the modal energy equation can be written as
+\begin{equation}
+    \ddot{\xi} + 4 \omega^2 \xi = \phi^2 F,
+\end{equation}
+where $\omega$ is the natural frequencies and $\phi$ the eigenmodes of the structure. \newline
+
+The energy provided by each mode at each time step will be $E_i(t) = \xi_i(t) \phi_i^2$. 
+
+\newpage
+
+The equation of motion
+
+\begin{equation}
+    M_{ij} \ddot{u}_j + C_{ij} \dot{u}_j + K_{ij}u_j = f_i,
+    \label{eq:motion_equation_damping}
+\end{equation}
+where $M$, $C$ and $K$ are the mass, damping and stiffness matrices respectively.\newline
+
+We consider a Rayleigh-damping $C_{ij} = \alpha M_{ij} + \beta K_{ij}$. The equation \ref{eq:motion_equation_damping} can be expressed as
+\begin{equation}
+    M_{ij} \ddot{u}_j + \alpha M_{ij} \dot{u}_j + \beta K_{ij} \dot{u}_j + K_{ij}u_j = f_i.
+\end{equation}
+
+Multiplying $\dot{u}_i$ to the above equation, the energy equation is obtained
+\begin{equation}  
+    \dot{u}_i M_{ij} \ddot{u}_j + \dot{u}_i \alpha M_{ij} \dot{u}_j + \dot{u}_i \beta K_{ij} \dot{u}_j + \dot{u}_i K_{ij}u_j = \dot{u}_i f_i.
+\label{eq:energy_with_damping}
+\end{equation}
+
+The displacement, velocity and acceleration can be written as $u_j = \sum^m \lambda^m \delta_j^m$, $\dot{u}_j = \sum^m \dot{\lambda}^m \delta_j^m$ and $\ddot{u}_j = \sum^m \ddot{\lambda}^m \delta_j^m$ respectively. Considering that the eigenvectors are mass-normalized, the equation \ref{eq:energy_with_damping} can be thus written 
+
+\begin{equation}
+    \dot{\lambda}^m \ddot{\lambda}^m + \alpha (\dot{\lambda}^m)^2 + \beta \omega_m^2 (\dot{\lambda}^m)^2 + \dot{\lambda}^m \omega_m^2 \lambda^m = \dot{\lambda}^m \delta_i^m f_i.
+\end{equation}
+
+The modal energy can be expressed as
+\begin{equation}
+    E^m = \frac{1}{2} (\dot{\lambda}^m) + \omega_m^2 \frac{1}{2} \lambda^m.
+\end{equation}
+
+The time evolution of the modal energy is
+\begin{equation}
+    \frac{d E}{dt} = \dot{\lambda}^m \delta_i^m f_i - (\dot{\lambda}^m)^2(\alpha + \beta \omega_m^2),
+\end{equation}
+where the first term of the RHS of the equation represents the energy introduced by the external forcing and the second term is the energy pumped out through the Rayleigh damping. \newline
+
+The energy contribution of node i to mode m is expressed as
+\begin{equation}
+    E_i^m = \frac{1}{2} (\dot{\lambda}^m) + \frac{k_i}{m_i} \frac{1}{2} \lambda^m,
+\end{equation}
+where $m_i = M_{ij} \delta_j^m$ and $k_i = K_{ij} \delta_j^m$.
+
+The evolution of the energy contribution of node i to mode m is thus obtained 
+\begin{equation}
+    \frac{d E_i^m}{dt} = \frac{\dot{\lambda}^m f_i}{m_i} - (\dot{\lambda}^m)^2 (\alpha  - \beta \frac{k_i}{m_i}).
+\end{equation}
+
+\end{document}
